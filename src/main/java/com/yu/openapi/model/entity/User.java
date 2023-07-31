@@ -44,8 +44,14 @@ public class User implements Serializable {
      * 用户头像
      */
     private String userAvatar;
-
-
+    /**
+     * acK
+     */
+    private String accessKey;
+    /**
+     * scK
+     */
+    private String secretKey;
     /**
      * 用户角色：user/admin/ban
      */
