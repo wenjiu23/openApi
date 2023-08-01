@@ -1,20 +1,19 @@
 package com.yu.openapi.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.common.model.entity.InterfaceInfo;
+import com.common.model.entity.User;
+import com.common.model.entity.UserInterfaceInfo;
+import com.common.model.vo.SelfInterfaceDateVo;
 import com.yu.openapi.annotation.AuthCheck;
 import com.yu.openapi.common.*;
 import com.yu.openapi.constant.CommonConstant;
 import com.yu.openapi.exception.BusinessException;
-import com.yu.openapi.model.dto.interfaceInfo.InterfaceInfoAddRequest;
-import com.yu.openapi.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
-import com.yu.openapi.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
 import com.yu.openapi.model.dto.userInterfaceInfo.UserInterfaceInfoQueryRequest;
 import com.yu.openapi.model.dto.userInterfaceInfo.UserInterfaceInfoUpdateRequest;
-import com.yu.openapi.model.entity.InterfaceInfo;
-import com.yu.openapi.model.entity.User;
-import com.yu.openapi.model.entity.UserInterfaceInfo;
-import com.yu.openapi.model.enums.InterfaceInfoStatusEnum;
+
 import com.yu.openapi.service.InterfaceInfoService;
 import com.yu.openapi.service.UserInterfaceInfoService;
 import com.yu.openapi.service.UserService;
@@ -25,7 +24,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.yu.openapi.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 接口管理
@@ -33,12 +35,14 @@ import java.util.List;
  *@author yj
  */
 @RestController
-@RequestMapping("/interfaceInfo")
+@RequestMapping("/userinterfaceInfo")
 @Slf4j
 public class UserInterfaceInfoController {
 
     @Resource
     private UserInterfaceInfoService userInterfaceInfoService;
+    @Resource
+    private InterfaceInfoService interfaceInfoService;
 
     @Resource
     private UserService userService;
@@ -141,6 +145,31 @@ public class UserInterfaceInfoController {
                 sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
         Page<UserInterfaceInfo> userInterfaceInfoPage = userInterfaceInfoService.page(new Page<>(current, size), queryWrapper);
         return ResultUtils.success(userInterfaceInfoPage);
+    }
+
+    @GetMapping("/selfInterfaceData")
+    public BaseResponse<List<SelfInterfaceDateVo>> selfInterfaceData(HttpServletRequest request){
+        User currentUser =(User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        Long id = currentUser.getId();
+        LambdaQueryWrapper<UserInterfaceInfo> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(UserInterfaceInfo::getUserId,id);
+        List<UserInterfaceInfo> list = userInterfaceInfoService.list(lqw);
+        List<SelfInterfaceDateVo> selfInterfaceDateVos = new ArrayList<>();
+
+        for (UserInterfaceInfo userInterfaceInfo : list) {
+            SelfInterfaceDateVo selfInterfaceDateVo = new SelfInterfaceDateVo();
+            BeanUtils.copyProperties(userInterfaceInfo,selfInterfaceDateVo);
+
+            Long interfaceInfoId = userInterfaceInfo.getInterfaceInfoId();
+            LambdaQueryWrapper<InterfaceInfo> lqw1 = new LambdaQueryWrapper<>();
+            lqw1.eq(InterfaceInfo::getId,interfaceInfoId);
+            InterfaceInfo one = interfaceInfoService.getOne(lqw1);
+
+            String name = one.getName();
+            selfInterfaceDateVo.setInterfaceName(name);
+            selfInterfaceDateVos.add(selfInterfaceDateVo);
+        }
+        return ResultUtils.success(selfInterfaceDateVos);
     }
 
 }

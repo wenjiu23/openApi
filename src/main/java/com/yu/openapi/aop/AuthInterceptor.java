@@ -1,9 +1,9 @@
 package com.yu.openapi.aop;
 
+import com.common.model.entity.User;
 import com.yu.openapi.annotation.AuthCheck;
 import com.yu.openapi.common.ErrorCode;
 import com.yu.openapi.exception.BusinessException;
-import com.yu.openapi.model.entity.User;
 import com.yu.openapi.model.enums.UserRoleEnum;
 import com.yu.openapi.service.UserService;
 

@@ -1,9 +1,10 @@
 package com.yu.openapi.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.common.model.entity.InterfaceInfo;
 import com.yu.openapi.common.ErrorCode;
 import com.yu.openapi.exception.BusinessException;
-import com.yu.openapi.model.entity.InterfaceInfo;
+
 import com.yu.openapi.service.InterfaceInfoService;
 import com.yu.openapi.mapper.InterfaceInfoMapper;
 import org.apache.commons.lang3.ObjectUtils;

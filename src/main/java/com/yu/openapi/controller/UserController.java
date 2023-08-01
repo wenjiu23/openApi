@@ -2,6 +2,9 @@ package com.yu.openapi.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import com.common.model.entity.User;
+import com.common.model.vo.LoginUserVO;
+import com.common.model.vo.UserVO;
 import com.yu.openapi.annotation.AuthCheck;
 import com.yu.openapi.common.BaseResponse;
 import com.yu.openapi.common.DeleteRequest;
@@ -16,9 +19,6 @@ import com.yu.openapi.model.dto.user.UserQueryRequest;
 import com.yu.openapi.model.dto.user.UserRegisterRequest;
 import com.yu.openapi.model.dto.user.UserUpdateMyRequest;
 import com.yu.openapi.model.dto.user.UserUpdateRequest;
-import com.yu.openapi.model.entity.User;
-import com.yu.openapi.model.vo.LoginUserVO;
-import com.yu.openapi.model.vo.UserVO;
 import com.yu.openapi.service.UserService;
 import java.util.List;
 import javax.annotation.Resource;

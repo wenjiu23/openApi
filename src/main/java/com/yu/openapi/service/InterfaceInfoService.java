@@ -1,7 +1,8 @@
 package com.yu.openapi.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yu.openapi.model.entity.InterfaceInfo;
+import com.common.model.entity.InterfaceInfo;
+
 
 /**
 * @author yj

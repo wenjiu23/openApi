@@ -1,7 +1,11 @@
 package com.yu.openapi.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.yu.openapi.model.entity.InterfaceInfo;
+import com.common.model.entity.InterfaceInfo;
+import com.common.model.vo.InvokeInterfaceInfoVO;
+
+import java.util.List;
+
 
 /**
 * @author yj

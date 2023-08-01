@@ -1,7 +1,8 @@
 package com.yu.openapi.service;
 
-import com.yu.openapi.model.entity.UserInterfaceInfo;
+
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.common.model.entity.UserInterfaceInfo;
 
 /**
 * @author yj
@@ -13,4 +14,10 @@ public interface UserInterfaceInfoService extends IService<UserInterfaceInfo> {
     void validUserInterfaceInfo(UserInterfaceInfo userInterfaceInfo, boolean add);
 
     boolean invokeInterfaceCount(long userId, long interfaceInfoId);
+
+    void getResource(Long userId, long id);
+
+    boolean isFirst(Long userId, long id);
+
+    boolean invokeInterfaceCountDelete(long interfaceInfoId, long userId);
 }

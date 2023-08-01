@@ -7,15 +7,17 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.common.model.entity.User;
+import com.common.model.vo.LoginUserVO;
+import com.common.model.vo.UserVO;
 import com.yu.openapi.common.ErrorCode;
 import com.yu.openapi.constant.CommonConstant;
 import com.yu.openapi.exception.BusinessException;
 import com.yu.openapi.mapper.UserMapper;
 import com.yu.openapi.model.dto.user.UserQueryRequest;
-import com.yu.openapi.model.entity.User;
+
 import com.yu.openapi.model.enums.UserRoleEnum;
-import com.yu.openapi.model.vo.LoginUserVO;
-import com.yu.openapi.model.vo.UserVO;
+
 import com.yu.openapi.service.UserService;
 import com.yu.openapi.utils.SqlUtils;
 import java.util.ArrayList;

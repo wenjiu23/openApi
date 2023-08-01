@@ -2,10 +2,10 @@ package com.yu.openapi.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.common.model.entity.User;
+import com.common.model.vo.LoginUserVO;
+import com.common.model.vo.UserVO;
 import com.yu.openapi.model.dto.user.UserQueryRequest;
-import com.yu.openapi.model.entity.User;
-import com.yu.openapi.model.vo.LoginUserVO;
-import com.yu.openapi.model.vo.UserVO;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 

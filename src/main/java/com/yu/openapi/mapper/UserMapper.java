@@ -1,7 +1,8 @@
 package com.yu.openapi.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.yu.openapi.model.entity.User;
+import com.common.model.entity.User;
+
 
 /**
  * 用户数据库操作

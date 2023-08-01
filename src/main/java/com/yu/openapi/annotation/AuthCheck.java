@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * 权限校验
- *
-
+ *Target(ElementType.METHOD)  该注解可以用在方法上
+ * Retention(RetentionPolicy.RUNTIME) 表示该注解在运行时保留，可以通过反射获取到
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

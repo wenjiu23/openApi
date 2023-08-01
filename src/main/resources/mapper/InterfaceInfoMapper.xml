@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yu.openapi.mapper.InterfaceInfoMapper">
 
-    <resultMap id="BaseResultMap" type="com.yu.openapi.model.entity.InterfaceInfo">
+    <resultMap id="BaseResultMap" type="com.common.model.entity.InterfaceInfo">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
             <result property="description" column="description" jdbcType="VARCHAR"/>
@@ -26,4 +26,6 @@
         status,method,user_id,requestParams,
         create_time,update_time,is_deleted
     </sql>
+
+
 </mapper>

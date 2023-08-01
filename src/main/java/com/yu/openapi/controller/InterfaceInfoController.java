@@ -1,19 +1,26 @@
 package com.yu.openapi.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.gson.Gson;
+
+import com.common.model.entity.InterfaceInfo;
+import com.common.model.entity.InvokeRequest;
+import com.common.model.entity.User;
+import com.yu.api_client.client.ApiClient;
+
 import com.yu.openapi.annotation.AuthCheck;
 import com.yu.openapi.common.*;
 import com.yu.openapi.constant.CommonConstant;
 import com.yu.openapi.exception.BusinessException;
+import com.yu.openapi.exception.ThrowUtils;
 import com.yu.openapi.model.dto.interfaceInfo.InterfaceInfoAddRequest;
 import com.yu.openapi.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.yu.openapi.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
-import com.yu.openapi.model.entity.InterfaceInfo;
-import com.yu.openapi.model.entity.User;
+import com.yu.openapi.model.dto.userInterfaceInfo.InvokeInterfaceRequest;
 import com.yu.openapi.model.enums.InterfaceInfoStatusEnum;
 import com.yu.openapi.service.InterfaceInfoService;
+import com.yu.openapi.service.UserInterfaceInfoService;
 import com.yu.openapi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,12 +29,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口管理
  *
- *@author yj
+ * @author yj
  */
 @RestController
 @RequestMapping("/interfaceInfo")
@@ -36,6 +46,8 @@ public class InterfaceInfoController {
 
     @Resource
     private InterfaceInfoService interfaceInfoService;
+    @Resource
+    private UserInterfaceInfoService userInterfaceInfoService;
 
     @Resource
     private UserService userService;
@@ -50,7 +62,6 @@ public class InterfaceInfoController {
      * @param request
      * @return
      */
-    @AuthCheck(mustRole = "admin")
     @PostMapping("/add")
     public BaseResponse<Long> addInterfaceInfo(@RequestBody InterfaceInfoAddRequest interfaceInfoAddRequest, HttpServletRequest request) {
         if (interfaceInfoAddRequest == null) {
@@ -105,7 +116,6 @@ public class InterfaceInfoController {
      * @param request
      * @return
      */
-    @AuthCheck(mustRole = "admin")
     @PostMapping("/update")
     public BaseResponse<Boolean> updateInterfaceInfo(@RequestBody InterfaceInfoUpdateRequest interfaceInfoUpdateRequest,
                                                      HttpServletRequest request) {
@@ -137,7 +147,6 @@ public class InterfaceInfoController {
      * @param id
      * @return
      */
-    @AuthCheck(mustRole = "admin")
     @GetMapping("/get")
     public BaseResponse<InterfaceInfo> getInterfaceInfoById(long id) {
         if (id <= 0) {
@@ -172,7 +181,6 @@ public class InterfaceInfoController {
      * @param request
      * @return
      */
-    @AuthCheck(mustRole = "admin")
     @GetMapping("/list/page")
     public BaseResponse<Page<InterfaceInfo>> listInterfaceInfoByPage(InterfaceInfoQueryRequest interfaceInfoQueryRequest, HttpServletRequest request) {
         if (interfaceInfoQueryRequest == null) {
@@ -180,19 +188,22 @@ public class InterfaceInfoController {
         }
         InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
         BeanUtils.copyProperties(interfaceInfoQueryRequest, interfaceInfoQuery);
+        String name = interfaceInfoQueryRequest.getName();
         long current = interfaceInfoQueryRequest.getCurrent();
         long size = interfaceInfoQueryRequest.getPageSize();
         String sortField = interfaceInfoQueryRequest.getSortField();
         String sortOrder = interfaceInfoQueryRequest.getSortOrder();
         String description = interfaceInfoQuery.getDescription();
-        // description 需支持模糊搜索
+        // content 需支持模糊搜索 如果不清空则无法模糊
         interfaceInfoQuery.setDescription(null);
+        interfaceInfoQuery.setName(null);
         // 限制爬虫
         if (size > 50) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
         queryWrapper.like(StringUtils.isNotBlank(description), "description", description);
+        queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
         queryWrapper.orderBy(StringUtils.isNotBlank(sortField),
                 sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
         Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size), queryWrapper);
@@ -201,19 +212,20 @@ public class InterfaceInfoController {
 
     /**
      * 上线接口
+     *
      * @param idRequest
      * @return
      */
     @PostMapping("/online")
     @AuthCheck(mustRole = "admin")
-    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest){
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest) {
         Long id = idRequest.getId();
-        if(idRequest == null || id<0){
+        if (idRequest == null || id < 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //判断接口是否存在
         InterfaceInfo interfaceInfoById = interfaceInfoService.getById(id);
-        if(interfaceInfoById ==null){
+        if (interfaceInfoById == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //判断接口是否可以调用
@@ -227,19 +239,20 @@ public class InterfaceInfoController {
 
     /**
      * 下线接口
+     *
      * @param idRequest
      * @return
      */
     @PostMapping("/offline")
     @AuthCheck(mustRole = "admin")
-    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest){
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest) {
         Long id = idRequest.getId();
-        if(idRequest == null || id<0){
+        if (idRequest == null || id < 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //判断接口是否存在
         InterfaceInfo interfaceInfoById = interfaceInfoService.getById(id);
-        if(interfaceInfoById ==null){
+        if (interfaceInfoById == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 更新数据库
@@ -248,5 +261,56 @@ public class InterfaceInfoController {
         interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
         boolean isSuccessful = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(isSuccessful);
+    }
+
+    /**
+     * 在线调用接口
+     *
+     * @param invokeInterfaceRequest 携带id、请求参数
+     * @return data
+     */
+    @PostMapping("/invoke")
+    public BaseResponse<Object> invokeInterface(@RequestBody InvokeInterfaceRequest invokeInterfaceRequest
+            , HttpServletRequest request) throws UnsupportedEncodingException {
+        if (invokeInterfaceRequest == null || invokeInterfaceRequest.getId() < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 判断接口是否存在
+        long id = invokeInterfaceRequest.getId();
+        InterfaceInfo interfaceInfo = interfaceInfoService.getById(id);
+        ThrowUtils.throwIf(interfaceInfo == null, ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(interfaceInfo.getStatus() != InterfaceInfoStatusEnum.ONLINE.getValue()
+                , ErrorCode.SYSTEM_ERROR, "接口未上线");
+        // 得到当前用户
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        String url = interfaceInfo.getUrl();
+        ApiClient client = new ApiClient(accessKey, secretKey, url);
+        //判断是否是第一次调用该接口
+        boolean first = userInterfaceInfoService.isFirst(loginUser.getId(), id);
+        //第一次调用会申请资源
+        if (first) {
+            try {
+                userInterfaceInfoService.getResource(loginUser.getId(), id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // 发送请求
+        String invokeUserRequestParams = invokeInterfaceRequest.getUserRequestParams();
+        InvokeRequest invokeRequest = JSONUtil.toBean(invokeUserRequestParams, InvokeRequest.class);
+        String result = client.invokeInterface(invokeRequest);
+        return ResultUtils.success(result);
+    }
+
+    @GetMapping("/interfaceNameList")
+    public BaseResponse<Map> interfaceNameList(){
+        List<InterfaceInfo> list = interfaceInfoService.list();
+        Map interfaceNameMap=new HashMap();
+        for (InterfaceInfo interfaceInfo : list) {
+            interfaceNameMap.put(interfaceInfo.getName(),interfaceInfo.getName());
+        }
+        return ResultUtils.success(interfaceNameMap);
     }
 }
