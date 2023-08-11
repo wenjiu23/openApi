@@ -19,7 +19,7 @@ spring:
   # todo 需替换配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/api_platform
+    url: jdbc:mysql://8.130.134.112:3306/api_platform
     username: root
     password: 123456
 dubbo:
@@ -29,7 +29,7 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://localhost:8848
+    address: nacos://8.130.134.112:8848
   # Redis 配置
   # todo 需替换配置，然后取消注释
 #  redis:
@@ -58,10 +58,7 @@ server:
     session:
       cookie:
         max-age: 2592000
-api:
-  clint:
-    accessKey: abc
-    secretKey: abcdef
+
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
