@@ -1,0 +1,9 @@
+-------------------------------------------------------------------------------
+Test set: com.yu.openapi.apiClientTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 481.402 s <<< FAILURE! - in com.yu.openapi.apiClientTest
+test  Time elapsed: 0.001 s  <<< ERROR!
+java.lang.IllegalStateException: Failed to load ApplicationContext
+Caused by: java.lang.RuntimeException: Can not create registry service-discovery-registry://8.130.134.112:8848/org.apache.dubbo.registry.RegistryService?application=dubbo-springboot-api-provider&dubbo=2.0.2&executor-management-mode=isolation&file-cache=true&interface=org.apache.dubbo.registry.RegistryService&pid=29036&registry=nacos&release=3.2.0
+Caused by: java.lang.IllegalStateException: Failed to create nacos naming service client. Reason: server status check failed.
+
